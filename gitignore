@@ -1,0 +1,44 @@
+# macOS
+
+.DS_Store
+
+# Node
+
+node_modules
+.nextj
+out
+
+# Python
+
+**pycache**/
+\*.pyc
+.venv
+venv
+
+# Environment
+
+.env
+.env.local
+
+# VS Code
+
+.vscode/settings.json
+
+# Logs
+
+\*.log
+
+# Docker
+
+postgres_data
+
+# Coverage
+
+coverage
+.coverage
+htmlcov
+
+# Build
+
+dist
+build
