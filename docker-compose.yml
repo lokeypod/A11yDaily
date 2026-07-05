@@ -1,10 +1,32 @@
 services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: a11ydaily
+      POSTGRES_PASSWORD: a11ydaily
+      POSTGRES_DB: a11ydaily
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
   api:
     build: ./apps/api
     ports:
       - "8000:8000"
     volumes:
       - ./apps/api:/app
+    environment:
+      DATABASE_URL: postgresql+psycopg://a11ydaily:a11ydaily@postgres:5432/a11ydaily
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
 
   web:
     build: ./apps/web
@@ -15,3 +37,8 @@ services:
       - /app/node_modules
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
