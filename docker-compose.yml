@@ -24,6 +24,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://a11ydaily:a11ydaily@postgres:5432/a11ydaily
       REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /app
     depends_on:
       - postgres
       - redis

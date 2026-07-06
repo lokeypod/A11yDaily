@@ -7,3 +7,4 @@ black
 sqlalchemy
 psycopg[binary]
 pydantic-settings
+alembic
