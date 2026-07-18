@@ -147,7 +147,8 @@ We value:
 - clean architecture
 - modular design
 - automated testing
-- maintainable code
+- maintainable codeDeveloper: Reload Window
+
 - thoughtful documentation
 - small, reviewable changes
 
