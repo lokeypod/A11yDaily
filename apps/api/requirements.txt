@@ -9,3 +9,4 @@ psycopg[binary]
 pydantic-settings
 alembic
 pytest-asyncio
+feedparser
