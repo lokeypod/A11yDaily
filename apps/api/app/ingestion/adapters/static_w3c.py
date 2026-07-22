@@ -4,8 +4,8 @@ from app.ingestion.raw_document import RawDocument
 from app.ingestion.source_adapter import SourceAdapter
 
 
-class FakeW3CAdapter(SourceAdapter):
-    """Test adapter that returns predictable W3C-style content."""
+class StaticW3CAdapter(SourceAdapter):
+    """Static adapter that returns predictable W3C-style content."""
 
     async def fetch(self) -> list[RawDocument]:
         return [
@@ -21,7 +21,7 @@ class FakeW3CAdapter(SourceAdapter):
                 author="W3C Web Accessibility Initiative",
                 language="en",
                 metadata={
-                    "adapter": "fake_w3c",
+                    "adapter": "static_w3c",
                     "content_type": "text/html",
                 },
             )

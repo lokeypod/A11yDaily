@@ -22,3 +22,6 @@ format:
 	docker compose run --rm api black .
 	docker compose run --rm api ruff check . --fix
 	docker compose run --rm web npm run lint
+
+ingest:
+	docker compose run --rm api python scripts/ingest.py

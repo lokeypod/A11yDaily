@@ -1,0 +1,24 @@
+sources:
+  - id: w3c-wai
+    name: W3C Web Accessibility Initiative
+    type: rss
+    url: https://www.w3.org/WAI/feed.xml
+    enabled: true
+
+  - id: webaim
+    name: WebAIM
+    type: rss
+    url: https://webaim.org/blog/feed/
+    enabled: true
+
+  - id: deque
+    name: Deque Systems
+    type: rss
+    url: https://www.deque.com/blog/feed/
+    enabled: true
+
+    - id: webaim
+    name: WebAIM
+    type: rss
+    url: https://webaim.org/blog/feed/
+    enabled: true

@@ -1,16 +1,25 @@
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-
-.venv/
+# Python
 __pycache__/
+*.py[cod]
 .pytest_cache/
 .ruff_cache/
-*.pyc
+.mypy_cache/
 
-node_modules/
+# Virtual environments
+.venv/
+
+# macOS
+.DS_Store
+
+# Next.js
 .next/
+node_modules/
 
-.env
-.env.local
+# Coverage
+.coverage
+htmlcov/
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json

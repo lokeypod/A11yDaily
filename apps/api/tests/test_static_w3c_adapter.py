@@ -1,11 +1,11 @@
 import pytest
 
-from app.ingestion.adapters.fake_w3c import FakeW3CAdapter
+from app.ingestion.adapters.static_w3c import StaticW3CAdapter
 
 
 @pytest.mark.asyncio
-async def test_fake_w3c_adapter_returns_raw_document() -> None:
-    adapter = FakeW3CAdapter()
+async def test_static_w3c_adapter_returns_raw_document() -> None:
+    adapter = StaticW3CAdapter()
 
     documents = await adapter.fetch()
 
@@ -17,4 +17,4 @@ async def test_fake_w3c_adapter_returns_raw_document() -> None:
     assert document.external_identifier == "w3c-example-001"
     assert document.title == "W3C publishes accessibility guidance"
     assert document.language == "en"
-    assert document.metadata["adapter"] == "fake_w3c"
+    assert document.metadata["adapter"] == "static_w3c"
