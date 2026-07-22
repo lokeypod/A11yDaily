@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.domain.knowledge_asset import KnowledgeAsset
@@ -32,6 +32,31 @@ class SqlAlchemyKnowledgeAssetRepository(KnowledgeAssetRepository):
 
         return KnowledgeAssetMapper.to_domain(model)
 
+    def find_recent(
+        self,
+        *,
+        offset: int = 0,
+        limit: int = 20,
+    ) -> list[KnowledgeAsset]:
+        statement = (
+            select(KnowledgeAssetModel)
+            .order_by(
+                KnowledgeAssetModel.published_at.desc(),
+                KnowledgeAssetModel.id.desc(),
+            )
+            .offset(offset)
+            .limit(limit)
+        )
+
+        models = self._session.scalars(statement).all()
+
+        return [KnowledgeAssetMapper.to_domain(model) for model in models]
+
+    def count(self) -> int:
+        statement = select(func.count()).select_from(KnowledgeAssetModel)
+
+        return self._session.scalar(statement) or 0
+
     def save(
         self,
         knowledge_asset: KnowledgeAsset,
@@ -43,17 +68,3 @@ class SqlAlchemyKnowledgeAssetRepository(KnowledgeAssetRepository):
         self._session.refresh(model)
 
         return KnowledgeAssetMapper.to_domain(model)
-
-    def get_recent(
-        self,
-        limit: int = 20,
-    ) -> list[KnowledgeAsset]:
-        statement = (
-            select(KnowledgeAssetModel)
-            .order_by(KnowledgeAssetModel.published_at.desc())
-            .limit(limit)
-        )
-
-        models = self._session.scalars(statement).all()
-
-        return [KnowledgeAssetMapper.to_domain(model) for model in models]
