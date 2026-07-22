@@ -14,6 +14,14 @@ class KnowledgeAssetRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def get_recent(
+        self,
+        limit: int = 20,
+    ) -> list[KnowledgeAsset]:
+        """Return the most recently published knowledge assets."""
+        raise NotImplementedError
+
+    @abstractmethod
     def save(
         self,
         knowledge_asset: KnowledgeAsset,

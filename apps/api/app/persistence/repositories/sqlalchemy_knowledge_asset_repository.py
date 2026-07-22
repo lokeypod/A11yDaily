@@ -43,3 +43,17 @@ class SqlAlchemyKnowledgeAssetRepository(KnowledgeAssetRepository):
         self._session.refresh(model)
 
         return KnowledgeAssetMapper.to_domain(model)
+
+    def get_recent(
+        self,
+        limit: int = 20,
+    ) -> list[KnowledgeAsset]:
+        statement = (
+            select(KnowledgeAssetModel)
+            .order_by(KnowledgeAssetModel.published_at.desc())
+            .limit(limit)
+        )
+
+        models = self._session.scalars(statement).all()
+
+        return [KnowledgeAssetMapper.to_domain(model) for model in models]

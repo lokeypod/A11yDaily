@@ -20,6 +20,12 @@ class InMemoryKnowledgeAssetRepository(KnowledgeAssetRepository):
     ) -> KnowledgeAsset | None:
         return self.assets_by_hash.get(content_hash)
 
+    def get_recent(
+        self,
+        limit: int = 20,
+    ) -> list[KnowledgeAsset]:
+        return list(self.assets_by_hash.values())[:limit]
+
     def save(
         self,
         knowledge_asset: KnowledgeAsset,
