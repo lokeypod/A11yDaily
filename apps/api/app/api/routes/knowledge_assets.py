@@ -19,7 +19,7 @@ router = APIRouter(
 def list_knowledge_assets() -> list[KnowledgeAssetResponse]:
     with SessionLocal() as session:
         repository = SqlAlchemyKnowledgeAssetRepository(session)
-        assets = repository.get_recent()
+        assets = repository.find_recent()
 
     return [
         KnowledgeAssetResponse(
