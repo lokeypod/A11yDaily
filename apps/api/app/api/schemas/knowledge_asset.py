@@ -15,5 +15,5 @@ class KnowledgeAssetResponse(BaseModel):
 class KnowledgeAssetListResponse(BaseModel):
     items: list[KnowledgeAssetResponse]
     page: int = Field(ge=1)
-    page_size: int = Field(ge=1)
+    page_size: int = Field(ge=1, le=100)
     total: int = Field(ge=0)
