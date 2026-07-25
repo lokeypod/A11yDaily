@@ -37,14 +37,23 @@ def list_knowledge_assets(
         le=100,
         description="Number of items returned per page.",
     ),
+    q: str | None = Query(
+        default=None,
+        min_length=1,
+        max_length=200,
+        description="Search term matched against titles and summaries.",
+    ),
 ) -> KnowledgeAssetListResponse:
     offset = (page - 1) * page_size
 
     assets = repository.find_recent(
         offset=offset,
         limit=page_size,
+        query=q,
     )
-    total = repository.count()
+    total = repository.count(
+        query=q,
+    )
 
     return KnowledgeAssetListResponse(
         items=[

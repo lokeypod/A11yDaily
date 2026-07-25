@@ -10,5 +10,7 @@ from app.repositories.knowledge_assets_repository import (
 
 
 def get_knowledge_asset_repository() -> Generator[KnowledgeAssetRepository, None, None]:
+    """Provide a repository with a managed database session."""
+
     with SessionLocal() as session:
         yield SqlAlchemyKnowledgeAssetRepository(session)
