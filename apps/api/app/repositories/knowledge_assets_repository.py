@@ -13,15 +13,17 @@ class KnowledgeAssetRepository(ABC):
     ) -> KnowledgeAsset | None:
         raise NotImplementedError
 
-    @abstractmethod
-    def find_recent(
-        self,
-        *,
-        offset: int = 0,
-        limit: int = 20,
-    ) -> list[KnowledgeAsset]:
-        """Return recent knowledge assets with pagination."""
-        raise NotImplementedError
+
+@abstractmethod
+def find_recent(
+    self,
+    *,
+    offset: int = 0,
+    limit: int = 20,
+    query: str | None = None,
+) -> list[KnowledgeAsset]:
+    """Return recent knowledge assets, optionally filtered by keyword."""
+    raise NotImplementedError
 
     @abstractmethod
     def count(self) -> int:
