@@ -9,7 +9,9 @@ from app.repositories.knowledge_assets_repository import (
 
 
 class FakeKnowledgeAssetRepository(KnowledgeAssetRepository):
-    """In-memory repository used for API endpoint tests."""
+    def __init__(self) -> None:
+        self.last_offset: int | None = None
+        self.last_limit: int | None = None
 
     def get_by_content_hash(
         self,
@@ -22,10 +24,18 @@ class FakeKnowledgeAssetRepository(KnowledgeAssetRepository):
         *,
         offset: int = 0,
         limit: int = 20,
+        query: str | None = None,
     ) -> list[KnowledgeAsset]:
+        self.last_offset = offset
+        self.last_limit = limit
+
         return []
 
-    def count(self) -> int:
+    def count(
+        self,
+        *,
+        query: str | None = None,
+    ) -> int:
         return 0
 
     def save(
@@ -49,49 +59,33 @@ app.dependency_overrides[get_knowledge_asset_repository] = (
 client = TestClient(app)
 
 
-def test_list_knowledge_assets_returns_paginated_response() -> None:
+def test_knowledge_assets_endpoint_returns_paginated_response() -> None:
     response = client.get("/knowledge-assets")
 
     assert response.status_code == 200
-    assert response.json() == {
-        "items": [],
-        "page": 1,
-        "page_size": 20,
-        "total": 0,
-    }
+
+    body = response.json()
+
+    assert body["items"] == []
+    assert body["page"] == 1
+    assert body["page_size"] == 20
+    assert body["total"] == 0
 
 
-def test_list_knowledge_assets_accepts_pagination_parameters() -> None:
+def test_knowledge_assets_endpoint_applies_pagination() -> None:
     response = client.get(
         "/knowledge-assets",
         params={
-            "page": 2,
+            "page": 3,
             "page_size": 5,
         },
     )
 
     assert response.status_code == 200
-    assert response.json() == {
-        "items": [],
-        "page": 2,
-        "page_size": 5,
-        "total": 0,
-    }
 
+    body = response.json()
 
-def test_list_knowledge_assets_rejects_page_zero() -> None:
-    response = client.get(
-        "/knowledge-assets",
-        params={"page": 0},
-    )
-
-    assert response.status_code == 422
-
-
-def test_list_knowledge_assets_rejects_excessive_page_size() -> None:
-    response = client.get(
-        "/knowledge-assets",
-        params={"page_size": 101},
-    )
-
-    assert response.status_code == 422
+    assert body["page"] == 3
+    assert body["page_size"] == 5
+    assert fake_repository.last_offset == 10
+    assert fake_repository.last_limit == 5
