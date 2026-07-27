@@ -12,6 +12,7 @@ class FakeKnowledgeAssetRepository(KnowledgeAssetRepository):
     def __init__(self) -> None:
         self.last_offset: int | None = None
         self.last_limit: int | None = None
+        self.last_query: str | None = None
 
     def get_by_content_hash(
         self,
@@ -28,6 +29,7 @@ class FakeKnowledgeAssetRepository(KnowledgeAssetRepository):
     ) -> list[KnowledgeAsset]:
         self.last_offset = offset
         self.last_limit = limit
+        self.last_query = query
 
         return []
 
@@ -89,3 +91,13 @@ def test_knowledge_assets_endpoint_applies_pagination() -> None:
     assert body["page_size"] == 5
     assert fake_repository.last_offset == 10
     assert fake_repository.last_limit == 5
+
+
+def test_knowledge_assets_endpoint_passes_search_query() -> None:
+    response = client.get(
+        "/knowledge-assets",
+        params={"q": "pdf"},
+    )
+
+    assert response.status_code == 200
+    assert fake_repository.last_query == "pdf"
