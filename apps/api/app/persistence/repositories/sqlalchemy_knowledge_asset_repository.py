@@ -37,10 +37,20 @@ class SqlAlchemyKnowledgeAssetRepository(KnowledgeAssetRepository):
         *,
         offset: int = 0,
         limit: int = 20,
+        query: str | None = None,
     ) -> list[KnowledgeAsset]:
+
+        statement = select(KnowledgeAssetModel)
+
+        if query:
+            search_term = f"%{query.strip()}%"
+            statement = statement.where(
+                KnowledgeAssetModel.title.ilike(search_term)
+                | KnowledgeAssetModel.summary.ilike(search_term)
+            )
+
         statement = (
-            select(KnowledgeAssetModel)
-            .order_by(
+            statement.order_by(
                 KnowledgeAssetModel.published_at.desc(),
                 KnowledgeAssetModel.id.desc(),
             )
@@ -52,8 +62,19 @@ class SqlAlchemyKnowledgeAssetRepository(KnowledgeAssetRepository):
 
         return [KnowledgeAssetMapper.to_domain(model) for model in models]
 
-    def count(self) -> int:
+    def count(
+        self,
+        *,
+        query: str | None = None,
+    ) -> int:
         statement = select(func.count()).select_from(KnowledgeAssetModel)
+
+        if query:
+            search_term = f"%{query.strip()}%"
+            statement = statement.where(
+                KnowledgeAssetModel.title.ilike(search_term)
+                | KnowledgeAssetModel.summary.ilike(search_term)
+            )
 
         return self._session.scalar(statement) or 0
 
