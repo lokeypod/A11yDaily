@@ -135,5 +135,5 @@ Because they know they can trust what they find.
 
 - CONSTITUTION.md
 - PRD.md
-- ROADMAP.md
+- project-management/ROADMAP.md
 - ARCHITECTURE.md

@@ -462,5 +462,5 @@ Every product, engineering, editorial, and business decision should support that
 - `docs/ARCHITECTURE.md`
 - `docs/DOMAIN_MODEL.md`
 - `docs/ENGINEERING.md`
-- `docs/ROADMAP.md`
+- `docs/project-management/ROADMAP.md`
 - `docs/adr/`
