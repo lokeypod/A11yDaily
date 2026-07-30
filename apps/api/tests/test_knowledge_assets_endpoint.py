@@ -101,3 +101,12 @@ def test_knowledge_assets_endpoint_passes_search_query() -> None:
 
     assert response.status_code == 200
     assert fake_repository.last_query == "pdf"
+
+
+def test_knowledge_assets_endpoint_rejects_invalid_page() -> None:
+    response = client.get(
+        "/knowledge-assets",
+        params={"page": 0},
+    )
+
+    assert response.status_code == 422
