@@ -42,19 +42,21 @@ class InMemoryKnowledgeAssetRepository(KnowledgeAssetRepository):
 
 def find_recent(
     self,
+    *,
+    offset: int = 0,
     limit: int = 20,
+    query: str | None = None,
 ) -> list[KnowledgeAsset]:
-    return list(self.assets_by_hash.values())[:limit]
+    assets = list(self.assets_by_hash.values())
+    return assets[offset : offset + limit]
 
 
-def save(
+def count(
     self,
-    knowledge_asset: KnowledgeAsset,
-) -> KnowledgeAsset:
-    if knowledge_asset.content_hash is not None:
-        self.assets_by_hash[knowledge_asset.content_hash] = knowledge_asset
-
-    return knowledge_asset
+    *,
+    query: str | None = None,
+) -> int:
+    return len(self.assets_by_hash)
 
 
 def create_document(
