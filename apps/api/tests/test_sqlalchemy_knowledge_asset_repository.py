@@ -79,3 +79,21 @@ def test_find_recent_searches_summary(
 
     assert len(results) == 1
     assert results[0].title == "Document accessibility update"
+
+
+def test_find_recent_trims_whitespace_from_query(
+    database_session: Session,
+) -> None:
+    repository = SqlAlchemyKnowledgeAssetRepository(database_session)
+
+    repository.save(
+        create_asset(
+            title="PDF Accessibility Techniques",
+            summary="Creating tagged PDF documents",
+        )
+    )
+
+    results = repository.find_recent(query="   pdf   ")
+
+    assert len(results) == 1
+    assert results[0].title == "PDF Accessibility Techniques"
