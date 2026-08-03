@@ -97,3 +97,20 @@ def test_find_recent_trims_whitespace_from_query(
 
     assert len(results) == 1
     assert results[0].title == "PDF Accessibility Techniques"
+
+
+def test_find_recent_returns_empty_list_when_query_has_no_matches(
+    database_session: Session,
+) -> None:
+    repository = SqlAlchemyKnowledgeAssetRepository(database_session)
+
+    repository.save(
+        create_asset(
+            title="WCAG 2.2 Focus Appearance",
+            summary="Latest WCAG guidance",
+        )
+    )
+
+    results = repository.find_recent(query="bananas")
+
+    assert results == []
