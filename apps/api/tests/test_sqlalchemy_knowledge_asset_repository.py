@@ -145,3 +145,73 @@ def test_count_applies_search_query(
     total = repository.count(query="pdf")
 
     assert total == 1
+
+
+def test_find_recent_returns_newest_assets_first(
+    database_session: Session,
+) -> None:
+    repository = SqlAlchemyKnowledgeAssetRepository(database_session)
+
+    repository.save(
+        create_asset(
+            title="Old Article",
+            published_day=18,
+        )
+    )
+
+    repository.save(
+        create_asset(
+            title="Newest Article",
+            published_day=20,
+        )
+    )
+
+    repository.save(
+        create_asset(
+            title="Middle Article",
+            published_day=19,
+        )
+    )
+
+    results = repository.find_recent()
+
+    assert [asset.title for asset in results] == [
+        "Newest Article",
+        "Middle Article",
+        "Old Article",
+    ]
+
+
+def test_find_recent_applies_offset_and_limit(
+    database_session: Session,
+) -> None:
+    repository = SqlAlchemyKnowledgeAssetRepository(database_session)
+
+    repository.save(
+        create_asset(
+            title="Newest Article",
+            published_day=20,
+        )
+    )
+
+    repository.save(
+        create_asset(
+            title="Middle Article",
+            published_day=19,
+        )
+    )
+
+    repository.save(
+        create_asset(
+            title="Oldest Article",
+            published_day=18,
+        )
+    )
+
+    results = repository.find_recent(
+        offset=1,
+        limit=1,
+    )
+
+    assert len(results) == 1
+    assert results[0].title == "Middle Article"
