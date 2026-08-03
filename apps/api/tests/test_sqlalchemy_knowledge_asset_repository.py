@@ -114,3 +114,34 @@ def test_find_recent_returns_empty_list_when_query_has_no_matches(
     results = repository.find_recent(query="bananas")
 
     assert results == []
+
+
+def test_count_applies_search_query(
+    database_session: Session,
+) -> None:
+    repository = SqlAlchemyKnowledgeAssetRepository(database_session)
+
+    repository.save(
+        create_asset(
+            title="PDF Accessibility Techniques",
+            summary="Creating tagged PDF documents",
+        )
+    )
+
+    repository.save(
+        create_asset(
+            title="WCAG 2.2 Focus Appearance",
+            summary="Latest WCAG guidance",
+        )
+    )
+
+    repository.save(
+        create_asset(
+            title="European Accessibility Act",
+            summary="Legislation overview",
+        )
+    )
+
+    total = repository.count(query="pdf")
+
+    assert total == 1
