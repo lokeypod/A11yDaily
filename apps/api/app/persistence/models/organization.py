@@ -8,6 +8,8 @@ from app.database.base import Base
 
 
 class OrganizationModel(Base):
+    """Database representation of an organization."""
+
     __tablename__ = "organizations"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -16,9 +18,32 @@ class OrganizationModel(Base):
         default=uuid.uuid4,
     )
 
-    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    website: Mapped[str] = mapped_column(String(500), nullable=False)
-    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    name: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
 
-    authority_score: Mapped[int] = mapped_column(Integer, nullable=False, default=100)
-    verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    website: Mapped[str] = mapped_column(
+        String(2_000),
+        nullable=False,
+        unique=True,
+    )
+
+    description: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    authority_score: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=100,
+    )
+
+    verified: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+    )
