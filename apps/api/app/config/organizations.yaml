@@ -1,0 +1,20 @@
+- slug: w3c
+  name: W3C
+  website: https://www.w3.org
+  description: World Wide Web Consortium
+  authority_score: 100
+  verified: true
+
+- slug: iaap
+  name: IAAP
+  website: https://www.accessibilityassociation.org
+  description: International Association of Accessibility Professionals
+  authority_score: 95
+  verified: true
+
+- slug: adobe
+  name: Adobe
+  website: https://www.adobe.com
+  description: Adobe accessibility initiatives
+  authority_score: 90
+  verified: true
