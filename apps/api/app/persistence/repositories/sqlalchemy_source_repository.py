@@ -78,3 +78,16 @@ class SqlAlchemySourceRepository(SourceRepository):
         self._session.refresh(model)
 
         return SourceMapper.to_domain(model)
+
+    def get_by_url(
+        self,
+        url: str,
+    ) -> Source | None:
+        statement = select(SourceModel).where(SourceModel.url == url)
+
+        model = self._session.scalar(statement)
+
+        if model is None:
+            return None
+
+        return SourceMapper.to_domain(model)

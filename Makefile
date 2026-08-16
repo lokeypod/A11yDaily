@@ -25,3 +25,6 @@ format:
 
 ingest:
 	docker compose run --rm api python scripts/ingest.py
+
+seed:
+	docker compose run --rm api python -m app.database.seed

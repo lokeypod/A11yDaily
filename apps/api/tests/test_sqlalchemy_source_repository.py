@@ -184,3 +184,22 @@ def test_get_all_returns_sources_alphabetically(
         "Deque Blog",
         "W3C News",
     ]
+
+
+def test_get_by_url(
+    database_session: Session,
+) -> None:
+    organization_repository = SqlAlchemyOrganizationRepository(database_session)
+    source_repository = SqlAlchemySourceRepository(database_session)
+
+    organization = create_organization()
+    organization_repository.save(organization)
+
+    source = create_source(
+        organization_id=organization.id,
+    )
+    source_repository.save(source)
+
+    result = source_repository.get_by_url(source.url)
+
+    assert result == source

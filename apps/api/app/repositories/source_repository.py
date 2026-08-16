@@ -40,3 +40,12 @@ class SourceRepository(ABC):
         source: Source,
     ) -> Source:
         raise NotImplementedError
+
+
+@abstractmethod
+def get_by_url(
+    self,
+    url: str,
+) -> Source | None:
+    """Return a source by its canonical URL."""
+    raise NotImplementedError
