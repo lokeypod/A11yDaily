@@ -1,33 +1,36 @@
 import logging
 
-from app.config.source_registry import SourceRegistry
 from app.ingestion.adapter_factory import AdapterFactory
 from app.ingestion.html_normalizer import HtmlDocumentNormalizer
 from app.ingestion.ingestion_service import IngestionService
 from app.ingestion.knowledge_asset_persistence_service import (
     KnowledgeAssetPersistenceService,
 )
+from app.repositories.source_repository import SourceRepository
 
 logger = logging.getLogger(__name__)
 
 
 class ConfiguredIngestionService:
-    """Run ingestion and persistence for all enabled configured sources."""
+    """Run ingestion and persistence for all active sources."""
 
     def __init__(
         self,
-        registry: SourceRegistry,
+        source_repository: SourceRepository,
         ingestion_service: IngestionService,
         persistence_service: KnowledgeAssetPersistenceService,
     ) -> None:
-        self._registry = registry
+        self._source_repository = source_repository
         self._ingestion_service = ingestion_service
         self._persistence_service = persistence_service
 
     async def ingest_all(self) -> None:
         normalizer = HtmlDocumentNormalizer()
 
-        for source in self._registry.enabled_sources():
+        for source in self._source_repository.get_all():
+            if not source.active:
+                continue
+
             logger.info(
                 "Starting ingestion for source: %s",
                 source.name,

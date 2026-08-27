@@ -1,8 +1,6 @@
 import asyncio
 import logging
 
-from app.config.settings import CONTENT_SOURCES_PATH
-from app.config.source_registry import SourceRegistry
 from app.database.session import SessionLocal
 from app.ingestion.configured_ingestion_service import (
     ConfiguredIngestionService,
@@ -17,14 +15,15 @@ from app.logging_config import configure_logging
 from app.persistence.repositories.sqlalchemy_knowledge_asset_repository import (
     SqlAlchemyKnowledgeAssetRepository,
 )
+from app.persistence.repositories.sqlalchemy_source_repository import (
+    SqlAlchemySourceRepository,
+)
 
 logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
     configure_logging()
-
-    registry = SourceRegistry.load(CONTENT_SOURCES_PATH)
 
     pipeline = IngestionPipeline(
         stages=[
@@ -37,23 +36,27 @@ async def main() -> None:
     )
 
     with SessionLocal() as session:
-        repository = SqlAlchemyKnowledgeAssetRepository(
+        source_repository = SqlAlchemySourceRepository(
+            session=session,
+        )
+
+        knowledge_asset_repository = SqlAlchemyKnowledgeAssetRepository(
             session=session,
         )
 
         persistence_service = KnowledgeAssetPersistenceService(
-            repository=repository,
+            repository=knowledge_asset_repository,
         )
 
         service = ConfiguredIngestionService(
-            registry=registry,
+            source_repository=source_repository,
             ingestion_service=ingestion_service,
             persistence_service=persistence_service,
         )
 
-        logger.info("Starting configured-source ingestion")
+        logger.info("Starting persisted-source ingestion")
         await service.ingest_all()
-        logger.info("Configured-source ingestion completed")
+        logger.info("Persisted-source ingestion completed")
 
 
 if __name__ == "__main__":

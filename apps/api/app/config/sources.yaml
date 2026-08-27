@@ -1,10 +1,18 @@
 - organization: w3c
   name: WAI News
-  url: https://www.w3.org/WAI/news/
+  url: https://www.w3.org/WAI/feed.xml
   connector_type: rss
   source_type: standards
   refresh_minutes: 60
   active: true
+
+- organization: w3c
+  name: WAI News
+  url: https://www.w3.org/WAI/news/
+  connector_type: rss
+  source_type: standards
+  refresh_minutes: 60
+  active: false
 
 - organization: w3c
   name: WAI Blog

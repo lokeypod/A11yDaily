@@ -1,17 +1,17 @@
-from app.config.source_config import SourceConfig
+from app.domain.source import ConnectorType, Source
 from app.ingestion.adapters.rss import RSSSourceAdapter
 from app.ingestion.source_adapter import SourceAdapter
 
 
 class AdapterFactory:
-    """Create source adapters from source configuration."""
+    """Create source adapters from persisted source definitions."""
 
     @staticmethod
-    def create(source: SourceConfig) -> SourceAdapter:
-        if source.type == "rss":
+    def create(source: Source) -> SourceAdapter:
+        if source.connector_type is ConnectorType.RSS:
             return RSSSourceAdapter(
-                source_identifier=source.id,
+                source_identifier=str(source.id),
                 feed_url=source.url,
             )
 
-        raise ValueError(f"Unsupported source type: {source.type}")
+        raise ValueError(f"Unsupported connector type: {source.connector_type.value}")

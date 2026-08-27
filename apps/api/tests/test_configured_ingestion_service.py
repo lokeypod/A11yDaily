@@ -1,8 +1,9 @@
+from uuid import uuid4
+
 import pytest
 
-from app.config.source_config import SourceConfig
-from app.config.source_registry import SourceRegistry
 from app.domain.knowledge_asset import KnowledgeAsset
+from app.domain.source import ConnectorType, Source, SourceType
 from app.ingestion.adapters.static_w3c import StaticW3CAdapter
 from app.ingestion.configured_ingestion_service import (
     ConfiguredIngestionService,
@@ -10,6 +11,16 @@ from app.ingestion.configured_ingestion_service import (
 from app.ingestion.html_normalizer import HtmlDocumentNormalizer
 from app.ingestion.ingestion_service import IngestionService
 from app.ingestion.normalized_document import NormalizedDocument
+
+
+class FakeSourceRepository:
+    """Test double that returns configured source domain objects."""
+
+    def __init__(self, sources: list[Source]) -> None:
+        self._sources = sources
+
+    def get_all(self) -> list[Source]:
+        return self._sources
 
 
 class RecordingIngestionService(IngestionService):
@@ -48,35 +59,47 @@ class RecordingPersistenceService:
         return []
 
 
+def create_source(
+    *,
+    name: str,
+    active: bool,
+) -> Source:
+    return Source(
+        id=uuid4(),
+        organization_id=uuid4(),
+        name=name,
+        url=f"https://example.com/{name.lower().replace(' ', '-')}.xml",
+        source_type=SourceType.STANDARDS,
+        connector_type=ConnectorType.RSS,
+        authority_score=100,
+        active=active,
+        refresh_minutes=60,
+        description=None,
+    )
+
+
 @pytest.mark.asyncio
-async def test_ingest_all_processes_only_enabled_sources(
+async def test_ingest_all_processes_only_active_sources(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    registry = SourceRegistry(
+    source_repository = FakeSourceRepository(
         sources=[
-            SourceConfig(
-                id="w3c-wai",
+            create_source(
                 name="W3C WAI",
-                type="rss",
-                url="https://example.com/w3c.xml",
-                enabled=True,
+                active=True,
             ),
-            SourceConfig(
-                id="disabled-source",
+            create_source(
                 name="Disabled Source",
-                type="rss",
-                url="https://example.com/disabled.xml",
-                enabled=False,
+                active=False,
             ),
         ]
     )
 
     def create_static_adapter(
-        source: SourceConfig,
+        source: Source,
     ) -> StaticW3CAdapter:
         del source
-
-    return StaticW3CAdapter()
+        return StaticW3CAdapter()
 
     monkeypatch.setattr(
         "app.ingestion.configured_ingestion_service.AdapterFactory.create",
@@ -87,7 +110,7 @@ async def test_ingest_all_processes_only_enabled_sources(
     persistence_service = RecordingPersistenceService()
 
     service = ConfiguredIngestionService(
-        registry=registry,
+        source_repository=source_repository,
         ingestion_service=ingestion_service,
         persistence_service=persistence_service,
     )

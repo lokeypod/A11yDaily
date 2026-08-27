@@ -22,11 +22,20 @@ class SourceRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_by_organization_id(
+    def get_by_organization_id_and_name(
         self,
         organization_id: UUID,
-    ) -> list[Source]:
-        """Return sources belonging to an organization."""
+        name: str,
+    ) -> Source | None:
+        """Return a source by organization and name."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_by_url(
+        self,
+        url: str,
+    ) -> Source | None:
+        """Return a source by its canonical URL."""
         raise NotImplementedError
 
     @abstractmethod
@@ -40,12 +49,3 @@ class SourceRepository(ABC):
         source: Source,
     ) -> Source:
         raise NotImplementedError
-
-
-@abstractmethod
-def get_by_url(
-    self,
-    url: str,
-) -> Source | None:
-    """Return a source by its canonical URL."""
-    raise NotImplementedError
