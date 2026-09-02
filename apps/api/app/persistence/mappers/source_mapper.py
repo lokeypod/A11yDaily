@@ -19,6 +19,10 @@ class SourceMapper:
             authority_score=source.authority_score,
             active=source.active,
             health_status=source.health_status.value,
+            last_attempt_at=source.last_attempt_at,
+            last_success_at=source.last_success_at,
+            consecutive_failures=source.consecutive_failures,
+            last_error=source.last_error,
             refresh_minutes=source.refresh_minutes,
             description=source.description,
         )
@@ -37,6 +41,10 @@ class SourceMapper:
             authority_score=model.authority_score,
             active=model.active,
             health_status=SourceHealthStatus(model.health_status),
+            last_attempt_at=model.last_attempt_at,
+            last_success_at=model.last_success_at,
+            consecutive_failures=model.consecutive_failures,
+            last_error=model.last_error,
             refresh_minutes=model.refresh_minutes,
             description=model.description,
         )

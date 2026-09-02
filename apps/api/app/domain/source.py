@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 from uuid import UUID
 
@@ -45,3 +46,7 @@ class Source:
     refresh_minutes: int = 60
     description: str | None = None
     health_status: SourceHealthStatus = SourceHealthStatus.HEALTHY
+    last_attempt_at: datetime | None = None
+    last_success_at: datetime | None = None
+    consecutive_failures: int = 0
+    last_error: str | None = None

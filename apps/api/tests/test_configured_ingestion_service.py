@@ -155,6 +155,10 @@ async def test_ingest_all_processes_only_active_sources(
     updated_source = source_repository.updated_sources[0]
 
     assert updated_source.health_status is SourceHealthStatus.HEALTHY
+    assert updated_source.last_attempt_at is not None
+    assert updated_source.last_success_at is not None
+    assert updated_source.consecutive_failures == 0
+    assert updated_source.last_error is None
 
 
 @pytest.mark.asyncio
@@ -197,4 +201,8 @@ async def test_ingest_all_marks_failed_source_degraded(
     updated_source = source_repository.updated_sources[0]
 
     assert updated_source.health_status is SourceHealthStatus.DEGRADED
+    assert updated_source.last_attempt_at is not None
+    assert updated_source.last_success_at is None
+    assert updated_source.consecutive_failures == 1
+    assert updated_source.last_error == "Simulated ingestion failure"
     assert persistence_service.persisted_documents == []

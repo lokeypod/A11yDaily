@@ -1,4 +1,5 @@
 import logging
+from datetime import UTC, datetime
 
 from app.domain.source import SourceHealthStatus
 from app.ingestion.adapter_factory import AdapterFactory
@@ -37,6 +38,8 @@ class ConfiguredIngestionService:
                 source.name,
             )
 
+            source.last_attempt_at = datetime.now(UTC)
+
             try:
                 adapter = AdapterFactory.create(source)
 
@@ -49,8 +52,11 @@ class ConfiguredIngestionService:
                     documents,
                 )
 
-            except Exception:
+            except Exception as exc:
                 source.health_status = SourceHealthStatus.DEGRADED
+                source.consecutive_failures += 1
+                source.last_error = str(exc)
+
                 self._source_repository.update(source)
 
                 logger.exception(
@@ -60,6 +66,10 @@ class ConfiguredIngestionService:
                 continue
 
             source.health_status = SourceHealthStatus.HEALTHY
+            source.last_success_at = datetime.now(UTC)
+            source.consecutive_failures = 0
+            source.last_error = None
+
             self._source_repository.update(source)
 
             logger.info(
