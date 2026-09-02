@@ -3,7 +3,12 @@ from uuid import uuid4
 import pytest
 
 from app.domain.knowledge_asset import KnowledgeAsset
-from app.domain.source import ConnectorType, Source, SourceType
+from app.domain.source import (
+    ConnectorType,
+    Source,
+    SourceHealthStatus,
+    SourceType,
+)
 from app.ingestion.adapters.static_w3c import StaticW3CAdapter
 from app.ingestion.configured_ingestion_service import (
     ConfiguredIngestionService,
@@ -18,9 +23,17 @@ class FakeSourceRepository:
 
     def __init__(self, sources: list[Source]) -> None:
         self._sources = sources
+        self.updated_sources: list[Source] = []
 
     def get_all(self) -> list[Source]:
         return self._sources
+
+    def update(
+        self,
+        source: Source,
+    ) -> Source:
+        self.updated_sources.append(source)
+        return source
 
 
 class RecordingIngestionService(IngestionService):
@@ -43,6 +56,20 @@ class RecordingIngestionService(IngestionService):
         )
 
         return [normalizer.normalize(document) for document in raw_documents]
+
+
+class FailingIngestionService(IngestionService):
+    """Test double that always raises during ingestion."""
+
+    async def ingest(
+        self,
+        adapter: StaticW3CAdapter,
+        normalizer: HtmlDocumentNormalizer,
+    ) -> list[NormalizedDocument]:
+        del adapter
+        del normalizer
+
+        raise RuntimeError("Simulated ingestion failure")
 
 
 class RecordingPersistenceService:
@@ -122,3 +149,52 @@ async def test_ingest_all_processes_only_active_sources(
     assert (
         persistence_service.persisted_documents[0].source_identifier == "w3c-wai-news"
     )
+
+    assert len(source_repository.updated_sources) == 1
+
+    updated_source = source_repository.updated_sources[0]
+
+    assert updated_source.health_status is SourceHealthStatus.HEALTHY
+
+
+@pytest.mark.asyncio
+async def test_ingest_all_marks_failed_source_degraded(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_repository = FakeSourceRepository(
+        sources=[
+            create_source(
+                name="Failing Source",
+                active=True,
+            ),
+        ]
+    )
+
+    def create_static_adapter(
+        source: Source,
+    ) -> StaticW3CAdapter:
+        del source
+        return StaticW3CAdapter()
+
+    monkeypatch.setattr(
+        "app.ingestion.configured_ingestion_service.AdapterFactory.create",
+        create_static_adapter,
+    )
+
+    ingestion_service = FailingIngestionService()
+    persistence_service = RecordingPersistenceService()
+
+    service = ConfiguredIngestionService(
+        source_repository=source_repository,
+        ingestion_service=ingestion_service,
+        persistence_service=persistence_service,
+    )
+
+    await service.ingest_all()
+
+    assert len(source_repository.updated_sources) == 1
+
+    updated_source = source_repository.updated_sources[0]
+
+    assert updated_source.health_status is SourceHealthStatus.DEGRADED
+    assert persistence_service.persisted_documents == []

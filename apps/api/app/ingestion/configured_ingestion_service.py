@@ -1,5 +1,6 @@
 import logging
 
+from app.domain.source import SourceHealthStatus
 from app.ingestion.adapter_factory import AdapterFactory
 from app.ingestion.html_normalizer import HtmlDocumentNormalizer
 from app.ingestion.ingestion_service import IngestionService
@@ -47,15 +48,22 @@ class ConfiguredIngestionService:
                 saved_assets = self._persistence_service.persist(
                     documents,
                 )
+
             except Exception:
+                source.health_status = SourceHealthStatus.DEGRADED
+                self._source_repository.update(source)
+
                 logger.exception(
                     "Ingestion failed for source: %s",
                     source.name,
                 )
                 continue
 
+            source.health_status = SourceHealthStatus.HEALTHY
+            self._source_repository.update(source)
+
             logger.info(
-                "Processed %d documents and saved %d new assets from source: %s",
+                "Processed %d documents and saved %d new assets " "from source: %s",
                 len(documents),
                 len(saved_assets),
                 source.name,
