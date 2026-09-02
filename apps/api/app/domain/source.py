@@ -24,6 +24,12 @@ class ConnectorType(str, Enum):
     MANUAL = "manual"
 
 
+class SourceHealthStatus(str, Enum):
+    HEALTHY = "healthy"
+    DEGRADED = "degraded"
+    INACTIVE = "inactive"
+
+
 @dataclass(slots=True)
 class Source:
     """Represents a public source where A11yDaily discovers knowledge."""
@@ -38,3 +44,4 @@ class Source:
     active: bool = True
     refresh_minutes: int = 60
     description: str | None = None
+    health_status: SourceHealthStatus = SourceHealthStatus.HEALTHY

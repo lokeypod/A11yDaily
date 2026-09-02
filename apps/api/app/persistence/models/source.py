@@ -69,3 +69,9 @@ class SourceModel(Base):
         Text,
         nullable=True,
     )
+
+    health_status: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        default="healthy",
+    )

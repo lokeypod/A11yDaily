@@ -1,7 +1,12 @@
 from uuid import uuid4
 
 from app.domain.organization import Organization
-from app.domain.source import ConnectorType, Source, SourceType
+from app.domain.source import (
+    ConnectorType,
+    Source,
+    SourceHealthStatus,
+    SourceType,
+)
 
 
 def create_organizations(
@@ -46,6 +51,7 @@ def create_sources(
             active=entry.get("active", True),
             refresh_minutes=entry.get("refresh_minutes", 60),
             description=entry.get("description"),
+            health_status=SourceHealthStatus(entry.get("health_status", "healthy")),
         )
 
         sources.append(source)

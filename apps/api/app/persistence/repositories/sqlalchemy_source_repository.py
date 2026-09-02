@@ -125,6 +125,7 @@ class SqlAlchemySourceRepository(SourceRepository):
         model.connector_type = source.connector_type
         model.authority_score = source.authority_score
         model.active = source.active
+        model.health_status = source.health_status.value
         model.refresh_minutes = source.refresh_minutes
         model.description = source.description
 

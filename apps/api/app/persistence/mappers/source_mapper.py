@@ -1,4 +1,4 @@
-from app.domain.source import Source
+from app.domain.source import Source, SourceHealthStatus
 from app.persistence.models.source import SourceModel
 
 
@@ -18,6 +18,7 @@ class SourceMapper:
             connector_type=source.connector_type,
             authority_score=source.authority_score,
             active=source.active,
+            health_status=source.health_status.value,
             refresh_minutes=source.refresh_minutes,
             description=source.description,
         )
@@ -35,6 +36,7 @@ class SourceMapper:
             connector_type=model.connector_type,
             authority_score=model.authority_score,
             active=model.active,
+            health_status=SourceHealthStatus(model.health_status),
             refresh_minutes=model.refresh_minutes,
             description=model.description,
         )

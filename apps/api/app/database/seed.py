@@ -73,6 +73,7 @@ def seed() -> None:
                 active=source.active,
                 refresh_minutes=source.refresh_minutes,
                 description=source.description,
+                health_status=source.health_status,
             )
 
             source_repository.update(synchronized)
@@ -108,6 +109,7 @@ def seed() -> None:
                 active=False,
                 refresh_minutes=persisted_source.refresh_minutes,
                 description=persisted_source.description,
+                health_status=persisted_source.health_status,
             )
 
             source_repository.update(deactivated_source)

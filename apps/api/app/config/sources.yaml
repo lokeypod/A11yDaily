@@ -5,6 +5,7 @@
   source_type: standards
   refresh_minutes: 60
   active: true
+  health_status: healthy
 
 - organization: w3c
   name: WAI Blog
@@ -13,3 +14,13 @@
   source_type: standards
   refresh_minutes: 60
   active: false
+  health_status: inactive
+
+- organization: deque
+  name: Deque Blog
+  url: https://www.deque.com/blog/feed/
+  connector_type: rss
+  source_type: vendor
+  refresh_minutes: 60
+  active: false
+  health_status: degraded
