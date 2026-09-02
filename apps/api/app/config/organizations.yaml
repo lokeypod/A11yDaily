@@ -18,3 +18,10 @@
   description: Adobe accessibility initiatives
   authority_score: 90
   verified: true
+
+- slug: deque
+  name: Deque Systems
+  website: https://www.deque.com
+  description: Digital accessibility company providing tools, training, and accessibility expertise.
+  authority_score: 90
+  verified: true
