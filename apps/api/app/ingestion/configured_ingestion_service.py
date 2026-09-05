@@ -12,6 +12,8 @@ from app.repositories.source_repository import SourceRepository
 
 logger = logging.getLogger(__name__)
 
+DEGRADED_FAILURE_THRESHOLD = 3
+
 
 class ConfiguredIngestionService:
     """Run ingestion and persistence for all active sources."""
@@ -53,9 +55,11 @@ class ConfiguredIngestionService:
                 )
 
             except Exception as exc:
-                source.health_status = SourceHealthStatus.DEGRADED
                 source.consecutive_failures += 1
                 source.last_error = str(exc)
+
+                if source.consecutive_failures >= DEGRADED_FAILURE_THRESHOLD:
+                    source.health_status = SourceHealthStatus.DEGRADED
 
                 self._source_repository.update(source)
 
