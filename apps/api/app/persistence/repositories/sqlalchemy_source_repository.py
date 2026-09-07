@@ -129,6 +129,7 @@ class SqlAlchemySourceRepository(SourceRepository):
         model.last_attempt_at = source.last_attempt_at
         model.last_success_at = source.last_success_at
         model.consecutive_failures = source.consecutive_failures
+        model.consecutive_empty_results = source.consecutive_empty_results
         model.last_error = source.last_error
         model.refresh_minutes = source.refresh_minutes
         model.description = source.description

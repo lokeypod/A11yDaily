@@ -93,6 +93,12 @@ class SourceModel(Base):
         default=0,
     )
 
+    consecutive_empty_results: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+    )
+
     last_error: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,

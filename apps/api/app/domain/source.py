@@ -49,4 +49,5 @@ class Source:
     last_attempt_at: datetime | None = None
     last_success_at: datetime | None = None
     consecutive_failures: int = 0
+    consecutive_empty_results: int = 0
     last_error: str | None = None

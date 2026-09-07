@@ -18,6 +18,20 @@ from app.ingestion.ingestion_service import IngestionService
 from app.ingestion.normalized_document import NormalizedDocument
 
 
+class EmptyIngestionService(IngestionService):
+    """Test double that returns no documents."""
+
+    async def ingest(
+        self,
+        adapter: StaticW3CAdapter,
+        normalizer: HtmlDocumentNormalizer,
+    ) -> list[NormalizedDocument]:
+        del adapter
+        del normalizer
+
+        return []
+
+
 class FakeSourceRepository:
     """Test double that returns configured source domain objects."""
 
@@ -103,6 +117,97 @@ def create_source(
         refresh_minutes=60,
         description=None,
     )
+
+
+@pytest.mark.asyncio
+async def test_ingest_all_records_empty_result_without_degrading(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = create_source(
+        name="Empty Source",
+        active=True,
+    )
+
+    source_repository = FakeSourceRepository(sources=[source])
+
+    def create_static_adapter(
+        source: Source,
+    ) -> StaticW3CAdapter:
+        del source
+        return StaticW3CAdapter()
+
+    monkeypatch.setattr(
+        "app.ingestion.configured_ingestion_service.AdapterFactory.create",
+        create_static_adapter,
+    )
+
+    ingestion_service = EmptyIngestionService()
+    persistence_service = RecordingPersistenceService()
+
+    service = ConfiguredIngestionService(
+        source_repository=source_repository,
+        ingestion_service=ingestion_service,
+        persistence_service=persistence_service,
+    )
+
+    await service.ingest_all()
+
+    assert len(source_repository.updated_sources) == 1
+
+    updated_source = source_repository.updated_sources[0]
+
+    assert updated_source.health_status is SourceHealthStatus.HEALTHY
+    assert updated_source.consecutive_empty_results == 1
+    assert updated_source.consecutive_failures == 0
+    assert updated_source.last_attempt_at is not None
+    assert updated_source.last_success_at is None
+    assert updated_source.last_error is None
+
+
+@pytest.mark.asyncio
+async def test_ingest_all_marks_source_degraded_after_empty_result_threshold(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = create_source(
+        name="Repeatedly Empty Source",
+        active=True,
+    )
+    source.consecutive_empty_results = 2
+
+    source_repository = FakeSourceRepository(sources=[source])
+
+    def create_static_adapter(
+        source: Source,
+    ) -> StaticW3CAdapter:
+        del source
+        return StaticW3CAdapter()
+
+    monkeypatch.setattr(
+        "app.ingestion.configured_ingestion_service.AdapterFactory.create",
+        create_static_adapter,
+    )
+
+    ingestion_service = EmptyIngestionService()
+    persistence_service = RecordingPersistenceService()
+
+    service = ConfiguredIngestionService(
+        source_repository=source_repository,
+        ingestion_service=ingestion_service,
+        persistence_service=persistence_service,
+    )
+
+    await service.ingest_all()
+
+    assert len(source_repository.updated_sources) == 1
+
+    updated_source = source_repository.updated_sources[0]
+
+    assert updated_source.health_status is SourceHealthStatus.DEGRADED
+    assert updated_source.consecutive_empty_results == 3
+    assert updated_source.consecutive_failures == 0
+    assert updated_source.last_attempt_at is not None
+    assert updated_source.last_success_at is None
+    assert updated_source.last_error is None
 
 
 @pytest.mark.asyncio

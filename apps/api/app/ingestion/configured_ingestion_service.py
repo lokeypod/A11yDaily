@@ -13,6 +13,7 @@ from app.repositories.source_repository import SourceRepository
 logger = logging.getLogger(__name__)
 
 DEGRADED_FAILURE_THRESHOLD = 3
+EMPTY_RESULT_THRESHOLD = 3
 
 
 class ConfiguredIngestionService:
@@ -69,9 +70,27 @@ class ConfiguredIngestionService:
                 )
                 continue
 
+            if not documents:
+                source.consecutive_empty_results += 1
+                source.last_error = None
+
+                if source.consecutive_empty_results >= EMPTY_RESULT_THRESHOLD:
+                    source.health_status = SourceHealthStatus.DEGRADED
+
+                self._source_repository.update(source)
+
+                logger.warning(
+                    "Source returned 0 documents: %s "
+                    "(consecutive empty results: %d)",
+                    source.name,
+                    source.consecutive_empty_results,
+                )
+                continue
+
             source.health_status = SourceHealthStatus.HEALTHY
             source.last_success_at = datetime.now(UTC)
             source.consecutive_failures = 0
+            source.consecutive_empty_results = 0
             source.last_error = None
 
             self._source_repository.update(source)
