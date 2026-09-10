@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>A11yDaily</title>
+</head>
+
+<body>
+    <main>
+        <header>
+            <h1>A11yDaily</h1>
+            <p>Accessibility knowledge feed</p>
+            <p>{{ total }} items</p>
+        </header>
+
+        {% if assets %}
+        {% for asset in assets %}
+        <article>
+            <h2>
+                <a href="{{ asset.url }}">
+                    {{ asset.title }}
+                </a>
+            </h2>
+
+            <p>
+                Published:
+                <time datetime="{{ asset.published_at.isoformat() }}">
+                    {{ asset.published_at.strftime("%B %d, %Y") }}
+                </time>
+            </p>
+
+            {% if asset.summary %}
+            <p>{{ asset.summary }}</p>
+            {% endif %}
+
+            <p>
+                <a href="{{ asset.url }}">
+                    View original
+                </a>
+            </p>
+        </article>
+
+        <hr>
+        {% endfor %}
+        {% else %}
+        <p>No accessibility content has been ingested yet.</p>
+        {% endif %}
+    </main>
+</body>
+
+</html>

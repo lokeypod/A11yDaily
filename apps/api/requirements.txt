@@ -11,3 +11,4 @@ alembic
 pytest-asyncio
 feedparser
 PyYAML
+jinja2
