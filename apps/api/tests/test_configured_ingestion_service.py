@@ -355,3 +355,53 @@ async def test_ingest_all_keeps_source_healthy_before_failure_threshold(
     assert updated_source.consecutive_failures == 1
     assert updated_source.last_error == "Simulated ingestion failure"
     assert persistence_service.persisted_documents == []
+
+
+@pytest.mark.asyncio
+async def test_ingest_all_recovers_degraded_source_after_success(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = create_source(
+        name="Recovered Source",
+        active=True,
+    )
+
+    source.health_status = SourceHealthStatus.DEGRADED
+    source.consecutive_failures = 3
+    source.consecutive_empty_results = 3
+    source.last_error = "Previous ingestion failure"
+
+    source_repository = FakeSourceRepository(sources=[source])
+
+    def create_static_adapter(
+        source: Source,
+    ) -> StaticW3CAdapter:
+        del source
+        return StaticW3CAdapter()
+
+    monkeypatch.setattr(
+        "app.ingestion.configured_ingestion_service.AdapterFactory.create",
+        create_static_adapter,
+    )
+
+    ingestion_service = RecordingIngestionService()
+    persistence_service = RecordingPersistenceService()
+
+    service = ConfiguredIngestionService(
+        source_repository=source_repository,
+        ingestion_service=ingestion_service,
+        persistence_service=persistence_service,
+    )
+
+    await service.ingest_all()
+
+    assert len(source_repository.updated_sources) == 1
+
+    updated_source = source_repository.updated_sources[0]
+
+    assert updated_source.health_status is SourceHealthStatus.HEALTHY
+    assert updated_source.consecutive_failures == 0
+    assert updated_source.consecutive_empty_results == 0
+    assert updated_source.last_error is None
+    assert updated_source.last_attempt_at is not None
+    assert updated_source.last_success_at is not None
