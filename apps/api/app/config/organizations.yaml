@@ -25,3 +25,10 @@
   description: Digital accessibility company providing tools, training, and accessibility expertise.
   authority_score: 90
   verified: true
+
+- slug: pac
+  name: PDF Accessibility Checker
+  website: https://pac.pdf-accessibility.org
+  description: PDF accessibility testing resource focused on PDF/UA, WCAG, and manual validation.
+  authority_score: 95
+  verified: true
