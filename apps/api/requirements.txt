@@ -12,3 +12,4 @@ pytest-asyncio
 feedparser
 PyYAML
 jinja2
+beautifulsoup4
