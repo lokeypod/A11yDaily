@@ -74,6 +74,9 @@ def seed() -> None:
                 refresh_minutes=source.refresh_minutes,
                 description=source.description,
                 health_status=source.health_status,
+                scraper_item_selector=source.scraper_item_selector,
+                scraper_title_selector=source.scraper_title_selector,
+                scraper_link_selector=source.scraper_link_selector,
             )
 
             source_repository.update(synchronized)
@@ -110,6 +113,9 @@ def seed() -> None:
                 refresh_minutes=persisted_source.refresh_minutes,
                 description=persisted_source.description,
                 health_status=persisted_source.health_status,
+                scraper_item_selector=persisted_source.scraper_item_selector,
+                scraper_title_selector=persisted_source.scraper_title_selector,
+                scraper_link_selector=persisted_source.scraper_link_selector,
             )
 
             source_repository.update(deactivated_source)

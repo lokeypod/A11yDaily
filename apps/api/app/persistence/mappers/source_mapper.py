@@ -1,4 +1,4 @@
-from app.domain.source import Source, SourceHealthStatus
+from app.domain.source import ConnectorType, Source, SourceHealthStatus
 from app.persistence.models.source import SourceModel
 
 
@@ -26,6 +26,9 @@ class SourceMapper:
             last_error=source.last_error,
             refresh_minutes=source.refresh_minutes,
             description=source.description,
+            scraper_item_selector=source.scraper_item_selector,
+            scraper_title_selector=source.scraper_title_selector,
+            scraper_link_selector=source.scraper_link_selector,
         )
 
     @staticmethod
@@ -38,7 +41,7 @@ class SourceMapper:
             name=model.name,
             url=model.url,
             source_type=model.source_type,
-            connector_type=model.connector_type,
+            connector_type=ConnectorType(model.connector_type),
             authority_score=model.authority_score,
             active=model.active,
             health_status=SourceHealthStatus(model.health_status),
@@ -49,4 +52,7 @@ class SourceMapper:
             last_error=model.last_error,
             refresh_minutes=model.refresh_minutes,
             description=model.description,
+            scraper_item_selector=model.scraper_item_selector,
+            scraper_title_selector=model.scraper_title_selector,
+            scraper_link_selector=model.scraper_link_selector,
         )

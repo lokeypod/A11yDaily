@@ -24,3 +24,15 @@
   refresh_minutes: 60
   active: false
   health_status: degraded
+  
+- organization: pac
+  name: PAC Accessibility Resources
+  url: https://pac.pdf-accessibility.org/en/resources/
+  connector_type: scraper
+  source_type: document_accessibility
+  refresh_minutes: 240
+  active: true
+  health_status: healthy
+  scraper_item_selector: ".neos-contentcollection"
+  scraper_title_selector: "h2"
+  scraper_link_selector: "a[href]"

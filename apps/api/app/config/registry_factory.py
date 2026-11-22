@@ -52,6 +52,9 @@ def create_sources(
             refresh_minutes=entry.get("refresh_minutes", 60),
             description=entry.get("description"),
             health_status=SourceHealthStatus(entry.get("health_status", "healthy")),
+            scraper_item_selector=entry.get("scraper_item_selector"),
+            scraper_title_selector=entry.get("scraper_title_selector"),
+            scraper_link_selector=entry.get("scraper_link_selector"),
         )
 
         sources.append(source)

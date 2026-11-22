@@ -51,3 +51,6 @@ class Source:
     consecutive_failures: int = 0
     consecutive_empty_results: int = 0
     last_error: str | None = None
+    scraper_item_selector: str | None = None
+    scraper_title_selector: str | None = None
+    scraper_link_selector: str | None = None

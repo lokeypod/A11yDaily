@@ -103,3 +103,16 @@ class SourceModel(Base):
         Text,
         nullable=True,
     )
+
+    scraper_item_selector: Mapped[str | None] = mapped_column(
+    String,
+    nullable=True,
+)
+    scraper_title_selector: Mapped[str | None] = mapped_column(
+    String,
+    nullable=True,
+)
+    scraper_link_selector: Mapped[str | None] = mapped_column(
+    String,
+    nullable=True,
+)

@@ -9,7 +9,7 @@ from app.persistence.models.source import SourceModel
 from app.repositories.source_repository import SourceRepository
 
 
-class SqlAlchemySourceRepository(SourceRepository):
+class SqlAlchemySourceRepository(SourceRepository): 
     """Persist sources using SQLAlchemy."""
 
     def __init__(
@@ -133,6 +133,9 @@ class SqlAlchemySourceRepository(SourceRepository):
         model.last_error = source.last_error
         model.refresh_minutes = source.refresh_minutes
         model.description = source.description
+        model.scraper_item_selector = source.scraper_item_selector
+        model.scraper_title_selector = source.scraper_title_selector
+        model.scraper_link_selector = source.scraper_link_selector
 
         self._session.commit()
         self._session.refresh(model)

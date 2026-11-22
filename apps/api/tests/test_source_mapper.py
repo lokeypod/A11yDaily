@@ -43,3 +43,13 @@ def test_mapper_converts_model_back_to_domain() -> None:
     result = SourceMapper.to_domain(model)
 
     assert result == source
+
+def test_mapper_converts_scraper_connector_type_to_enum() -> None:
+    source = create_source()
+    model = SourceMapper.to_model(source)
+
+    model.connector_type = "scraper"
+
+    restored_source = SourceMapper.to_domain(model)
+
+    assert restored_source.connector_type is ConnectorType.SCRAPER
