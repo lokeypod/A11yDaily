@@ -62,6 +62,7 @@ def list_knowledge_assets(
                 title=asset.title,
                 url=asset.url,
                 published_at=asset.published_at,
+                discovered_at=asset.discovered_at,
                 summary=asset.summary,
             )
             for asset in assets

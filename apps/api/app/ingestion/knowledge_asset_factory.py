@@ -12,7 +12,7 @@ class KnowledgeAssetFactory:
             id=uuid4(),
             title=document.title,
             url=document.canonical_url,
-            published_at=document.published_at or document.retrieved_at,
+            published_at=document.published_at,
             discovered_at=document.retrieved_at,
             summary=document.source_summary,
             content_hash=document.content_hash,

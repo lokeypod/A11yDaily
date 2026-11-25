@@ -25,10 +25,17 @@
             </h2>
 
             <p>
+                {% if asset.published_at %}
                 Published:
                 <time datetime="{{ asset.published_at.isoformat() }}">
                     {{ asset.published_at.strftime("%B %d, %Y") }}
                 </time>
+                {% else %}
+                Discovered:
+                <time datetime="{{ asset.discovered_at.isoformat() }}">
+                    {{ asset.discovered_at.strftime("%B %d, %Y") }}
+                </time>
+                {% endif %}
             </p>
 
             {% if asset.summary %}

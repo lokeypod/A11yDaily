@@ -31,7 +31,7 @@ def test_factory_creates_knowledge_asset() -> None:
     assert asset.content_hash == "example-hash"
 
 
-def test_factory_uses_retrieved_time_when_publish_date_is_missing() -> None:
+def test_factory_preserves_missing_publication_date() -> None:
     retrieved_at = datetime(2026, 7, 20, tzinfo=UTC)
 
     document = NormalizedDocument(
@@ -45,4 +45,5 @@ def test_factory_uses_retrieved_time_when_publish_date_is_missing() -> None:
 
     asset = KnowledgeAssetFactory().create(document)
 
-    assert asset.published_at == retrieved_at
+    assert asset.published_at is None
+    assert asset.discovered_at == retrieved_at

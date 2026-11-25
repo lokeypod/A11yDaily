@@ -31,9 +31,9 @@ class KnowledgeAssetModel(Base):
         index=True,
     )
 
-    published_at: Mapped[datetime] = mapped_column(
+    published_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
+        nullable=True,
     )
 
     discovered_at: Mapped[datetime] = mapped_column(

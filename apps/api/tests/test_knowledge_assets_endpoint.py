@@ -1,3 +1,7 @@
+from datetime import UTC, datetime
+from uuid import uuid4
+
+import pytest
 from fastapi.testclient import TestClient
 
 from app.api.dependencies import get_knowledge_asset_repository
@@ -9,7 +13,11 @@ from app.repositories.knowledge_assets_repository import (
 
 
 class FakeKnowledgeAssetRepository(KnowledgeAssetRepository):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        assets: list[KnowledgeAsset] | None = None,
+    ) -> None:
+        self.assets = assets if assets is not None else []
         self.last_offset: int | None = None
         self.last_limit: int | None = None
         self.last_query: str | None = None
@@ -31,14 +39,14 @@ class FakeKnowledgeAssetRepository(KnowledgeAssetRepository):
         self.last_limit = limit
         self.last_query = query
 
-        return []
+        return self.assets[offset : offset + limit]
 
     def count(
         self,
         *,
         query: str | None = None,
     ) -> int:
-        return 0
+        return len(self.assets)
 
     def save(
         self,
@@ -110,3 +118,40 @@ def test_knowledge_assets_endpoint_rejects_invalid_page() -> None:
     )
 
     assert response.status_code == 422
+
+def test_knowledge_assets_endpoint_preserves_unknown_publication_date(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    asset = KnowledgeAsset(
+        id=uuid4(),
+        title="Undated Accessibility Resource",
+        url="https://example.com/resource",
+        published_at=None,
+        discovered_at=datetime(2026, 11, 22, tzinfo=UTC),
+    )
+
+    repository = FakeKnowledgeAssetRepository([asset])
+
+    monkeypatch.setitem(
+        app.dependency_overrides,
+        get_knowledge_asset_repository,
+        lambda: repository,
+    )
+
+    response = client.get("/knowledge-assets")
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["total"] == 1
+    assert len(body["items"]) == 1
+
+    item = body["items"][0]
+
+    assert item["id"] == str(asset.id)
+    assert item["title"] == asset.title
+    assert item["published_at"] is None
+    assert datetime.fromisoformat(
+        item["discovered_at"]
+    ) == asset.discovered_at

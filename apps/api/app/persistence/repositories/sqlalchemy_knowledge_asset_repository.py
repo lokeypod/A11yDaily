@@ -51,7 +51,10 @@ class SqlAlchemyKnowledgeAssetRepository(KnowledgeAssetRepository):
 
         statement = (
             statement.order_by(
-                KnowledgeAssetModel.published_at.desc(),
+                func.coalesce(
+                    KnowledgeAssetModel.published_at,
+                    KnowledgeAssetModel.discovered_at,
+                ).desc(),
                 KnowledgeAssetModel.id.desc(),
             )
             .offset(offset)

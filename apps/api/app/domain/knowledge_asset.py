@@ -12,7 +12,7 @@ class KnowledgeAsset:
     title: str
     url: str
 
-    published_at: datetime
+    published_at: datetime | None
     discovered_at: datetime
 
     summary: str | None = None

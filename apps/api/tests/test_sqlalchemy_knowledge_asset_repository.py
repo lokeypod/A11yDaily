@@ -13,7 +13,8 @@ def create_asset(
     *,
     title: str = "Example Title",
     summary: str = "Example Summary",
-    published_day: int = 20,
+    published_day: int | None = 20,
+    discovered_day: int = 21,
 ) -> KnowledgeAsset:
     asset_id = uuid4()
 
@@ -24,8 +25,14 @@ def create_asset(
         summary=summary,
         ai_summary=None,
         content_hash=asset_id.hex.ljust(64, "0"),
-        published_at=datetime(2026, 7, published_day, tzinfo=UTC),
-        discovered_at=datetime(2026, 7, 21, tzinfo=UTC),
+        published_at=(
+            datetime(2026, 7, published_day, tzinfo=UTC)
+            if published_day is not None
+            else None
+        ),
+        discovered_at=datetime(
+            2026, 7, discovered_day, tzinfo=UTC
+        ),
     )
 
 
@@ -215,3 +222,62 @@ def test_find_recent_applies_offset_and_limit(
 
     assert len(results) == 1
     assert results[0].title == "Middle Article"
+
+def test_find_recent_uses_discovery_date_when_publication_is_unknown(
+    database_session: Session,
+) -> None:
+    repository = SqlAlchemyKnowledgeAssetRepository(database_session)
+
+    repository.save(
+        create_asset(
+            title="Older Published Article",
+            published_day=18,
+            discovered_day=25,
+        )
+    )
+
+    repository.save(
+        create_asset(
+            title="Undated Resource",
+            published_day=None,
+            discovered_day=21,
+        )
+    )
+
+    repository.save(
+        create_asset(
+            title="Newest Published Article",
+            published_day=23,
+            discovered_day=24,
+        )
+    )
+
+    results = repository.find_recent()
+
+    assert [asset.title for asset in results] == [
+        "Newest Published Article",
+        "Undated Resource",
+        "Older Published Article",
+    ]
+
+def test_repository_preserves_unknown_publication_date(
+    database_session: Session,
+) -> None:
+    repository = SqlAlchemyKnowledgeAssetRepository(database_session)
+
+    asset = create_asset(
+        title="Undated Accessibility Resource",
+        published_day=None,
+        discovered_day=22,
+    )
+
+    saved_asset = repository.save(asset)
+
+    assert saved_asset.published_at is None
+
+    results = repository.find_recent()
+
+    assert len(results) == 1
+    assert results[0].id == asset.id
+    assert results[0].published_at is None
+    assert results[0].discovered_at.date() == asset.discovered_at.date()

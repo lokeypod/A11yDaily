@@ -9,6 +9,7 @@ class KnowledgeAssetResponse(BaseModel):
     title: str
     url: str
     published_at: datetime | None
+    discovered_at: datetime
     summary: str | None
 
 
